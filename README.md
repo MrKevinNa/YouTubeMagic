@@ -4,5 +4,5 @@
 2. RSQLite 패키지를 활용한 DB 생성
 3. git2r 패키지를 활용한 github로 push 하기
 4. shiny 패키지를 활용한 대시보드 생성
-  - shinyapps.io로 대시보드 배포
+   (shinyapps.io로 대시보드 배포)
 5. cronr 패키지를 활용한 정기 작업 설정
