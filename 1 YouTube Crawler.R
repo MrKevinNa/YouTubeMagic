@@ -197,18 +197,17 @@ library(RSQLite)
 # DB를 연결합니다.
 conn <- dbConnect(drv = SQLite(), dbname = 'YouTube.sqlite')
 
-# 테이블 생성 여부를 확인합니다. TRUE가 출력되면 정상입니다!
+# SQLite에 있는 Table Name을 지정합니다.
 name <- 'YouTubeMagic'
-dbExistsTable(conn = conn, name = name)
 
-# SQLite에 저장된 데이터를 호출합니다.
+# SQLite Table에 저장되어 있는 데이터를 불러옵니다.
 db <- dbGetQuery(conn = conn, 
                  statement = str_glue('SELECT * FROM {name};'))
 
-# SQLite에 저장된 기존 `vlink`와 중복되는 건을 삭제합니다.
+# 새로 수집한 데이터에서 기존 `vlink`와 중복되는 건을 삭제합니다.
 df <- df %>% filter(!vlink %in% db$vlink)
 
-# 새로운 데이터를 한 번에 추가합니다.
+# 새로 수집한 데이터를 SQLite Table에 추가합니다.
 if(nrow(x = df) >= 1) {
   dbWriteTable(conn = conn, 
                name = name, 
@@ -228,10 +227,16 @@ dbDisconnect(conn = conn)
 # 필요한 패키지를 호출합니다.
 library(git2r)
 
-# 현재 폴더에 git을 설치합니다.
-repo <- init(path = '.')
+# 로컬 폴더를 Git Repository로 지정합니다.
+repo <- repository(path = getwd())
 
-# push를 수행합니다.
+# git에 sqlite 파일을 추가합니다. [Staging]
+add(repo = repo, path = 'YouTube.sqlite')
+
+# git에 변경사항을 적용합니다. [Commit]
+commit(repo = repo, message = str_glue('DB update at {Sys.time()}'))
+
+# 로컬 폴더의 커밋 정보를 원격 저장소로 등록합니다. [Push]
 push(object = repo, 
      name = 'YouTubeMagic', 
      refspec = 'refs/heads/master', 
